@@ -32,10 +32,11 @@ def manipulateArray(array):
     arr = [[1, 2, 3]*10, [1, 1, 1, 2, 2, 2]*5, y]
     sortedList = [[]]
     j = 0
-    condensedList = [['Seed', 'Dynamic', 'Foregone', 'WorkerID', 'AssignmentID', 'Trial#', 'SubmitTime',
+    condensedList = []
+    headers = ['Seed', 'Dynamic', 'Foregone', 'WorkerID', 'AssignmentID', 'Trial#', 'SubmitTime',
                        'Card Selection', 'Selected Value', 'Max value', 'TrialNo.', 'Condition', 'Selected Cumulative',
                        'Counter1', 'Counter2', 'Counter3', 'Counter4', 'Gender', 'Age', 'Reaction Time', 'Card1 R',
-                       'Card1 Mu', 'Card2 R', 'Card2 Mu', 'Card3 R', 'Card3 Mu', 'Card4 R', 'Card4 Mu']]
+                       'Card1 Mu', 'Card2 R', 'Card2 Mu', 'Card3 R', 'Card3 Mu', 'Card4 R', 'Card4 Mu']
 
     ## Make more readable
     for i in xrange(len(array)):
@@ -57,7 +58,9 @@ def manipulateArray(array):
     for i in xrange(len(sortedList)):
         if len(sortedList[i]) == 200: # Check to see worker has 200 trials
             condensedList.append(sortedList[i]) # If yes then copy to condensedList, headers = list[0][i]
-    for j in range(1, len(condensedList)): # Start one beneath headers
+
+    ## Condition read & write. The columns are in reverse order to the js, but otherwise identical
+    for j in xrange(len(condensedList)):
         for i in xrange(len(condensedList[j])): # Go one level deeper to the trial level
             condensedList[j][i] = [9, 9, 9] + condensedList[j][i] #Place holder for condition assignment
             ## 'Right' condition: Forgone Payoff
@@ -81,24 +84,24 @@ def manipulateArray(array):
                 condensedList[j][i][0] = 3
             elif arr[2][int(condensedList[j][i][11])] == 4:
                 condensedList[j][i][0] = 4
-            elif arr[2][int(condensedList[j][i][1])] == 5:
+            elif arr[2][int(condensedList[j][i][11])] == 5:
                 condensedList[j][i][0] = 5
     #print(condensedList[4])
-    # for i in xrange(len(condensedList[1:])):
-    #     condensedList[1:][i].sort(key = operator.itemgetter(0, 1, 2))
+    condensedList = sorted(condensedList, key=lambda x: (x[0:][0][0], x[0:][0][1], x[0:][0][2])) # Sort by Seed, then dynamic, then foregone
+    condensedList.insert(0, headers)
     return condensedList
 
 def writeResults(list):
     if raw_input('Would you like a CSV of the results? y or n: ') == 'y':
         now = datetime.datetime.now() # Used in csv writing
         c = open('Sorted_{}.csv'.format(now.strftime("%Y-%m-%d_%H.%M")), 'wb')
-        mywriter = csv.writer(c)
+        myWriter = csv.writer(c)
         for i in list:
-            if len(i) < 200: # To avoid looping too deep into headers
-                mywriter.writerow(i)
+            if len(i) < 200: # Ugly hack to avoid looping too deep into headers
+                myWriter.writerow(i)
             else:
                 for j in xrange(len(i)):
-                    mywriter.writerow(i[j])
+                    myWriter.writerow(i[j])
         c.close()
 
 arr = genArr()
