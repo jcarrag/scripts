@@ -32,8 +32,9 @@ def manipulateArray(array):
     arr = [[1, 2, 3]*10, [1, 1, 1, 2, 2, 2]*5, y]
     sortedList = [[]]
     j = 0
+    condIndex = 12
     condensedList = []
-    headers = ['Seed', 'Dynamic', 'Foregone', 'WorkerID', 'AssignmentID', 'Trial#', 'SubmitTime',
+    headers = ['Seed', 'Dynamic', 'Foregone', 'Block', 'WorkerID', 'AssignmentID', 'Trial#', 'SubmitTime',
                        'Card Selection', 'Selected Value', 'Max value', 'TrialNo.', 'Condition', 'Selected Cumulative',
                        'Counter1', 'Counter2', 'Counter3', 'Counter4', 'Gender', 'Age', 'Reaction Time', 'Card1 R',
                        'Card1 Mu', 'Card2 R', 'Card2 Mu', 'Card3 R', 'Card3 Mu', 'Card4 R', 'Card4 Mu']
@@ -62,30 +63,41 @@ def manipulateArray(array):
     ## Condition read & write. The columns are in reverse order to the js, but otherwise identical
     for j in xrange(len(condensedList)):
         for i in xrange(len(condensedList[j])): # Go one level deeper to the trial level
-            condensedList[j][i] = [9, 9, 9] + condensedList[j][i] #Place holder for condition assignment
+            condensedList[j][i] = [9, 9, 9, 9] + condensedList[j][i] #Place holder for condition assignment
             ## 'Right' condition: Forgone Payoff
-            if arr[0][int(condensedList[j][i][11])] == 1:
+            if arr[0][int(condensedList[j][i][condIndex])] == 1:
                 condensedList[j][i][2] = 1
-            elif arr[0][int(condensedList[j][i][11])] == 2:
+            elif arr[0][int(condensedList[j][i][condIndex])] == 2:
                 condensedList[j][i][2] = 2
-            elif arr[0][int(condensedList[j][i][11])] == 3:
+            elif arr[0][int(condensedList[j][i][condIndex])] == 3:
                 condensedList[j][i][2] = 3
             ## 'Middle' condition: Dynamic
-            if arr[1][int(condensedList[j][i][11])] == 1:
+            if arr[1][int(condensedList[j][i][condIndex])] == 1:
                 condensedList[j][i][1] = 1
-            elif arr[1][int(condensedList[j][i][11])] == 2:
+            elif arr[1][int(condensedList[j][i][condIndex])] == 2:
                 condensedList[j][i][1] = 2
             ## 'Left' condition: Seed
-            if arr[2][int(condensedList[j][i][11])] == 1:
+            if arr[2][int(condensedList[j][i][condIndex])] == 1:
                 condensedList[j][i][0] = 1
-            elif arr[2][int(condensedList[j][i][11])] == 2:
+            elif arr[2][int(condensedList[j][i][condIndex])] == 2:
                 condensedList[j][i][0] = 2
-            elif arr[2][int(condensedList[j][i][11])] == 3:
+            elif arr[2][int(condensedList[j][i][condIndex])] == 3:
                 condensedList[j][i][0] = 3
-            elif arr[2][int(condensedList[j][i][11])] == 4:
+            elif arr[2][int(condensedList[j][i][condIndex])] == 4:
                 condensedList[j][i][0] = 4
-            elif arr[2][int(condensedList[j][i][11])] == 5:
+            elif arr[2][int(condensedList[j][i][condIndex])] == 5:
                 condensedList[j][i][0] = 5
+            ## Assign block
+            for k in xrange(len(condensedList[j][i])):
+                if i < 50:
+                    condensedList[j][i][3] = 1
+                elif i >= 50 and i < 100:
+                    condensedList[j][i][3] = 2
+                elif i >= 100 and i < 150:
+                    condensedList[j][i][3] = 3
+                elif i >= 150 and i < 200:
+                    condensedList[j][i][3] = 4
+
     #print(condensedList[4])
     condensedList = sorted(condensedList, key=lambda x: (x[0:][0][0], x[0:][0][1], x[0:][0][2])) # Sort by Seed, then dynamic, then foregone
     condensedList.insert(0, headers)
